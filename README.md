@@ -1,5 +1,20 @@
 ### Milestone 1
 
+
+## Commands
+
+Running explore.ipynb
+
+1. Change directory
+`$ cd two-sigma-connect-rental-listing-inquiries/`
+2. Start Jupyter Notebook server
+`$ jupyter notebook`
+3. Click on `explore.ipynb` to open the file
+4. Run the file by `Kernal->Restart & Run All`
+
+
+## Milestone Progress
+
 * Exploratory data analysis
   - [x] Plot histograms for the following numeric columns: Price, Latitude &
 Longitude.
@@ -17,3 +32,12 @@ demonstrate them. Handle outliers.
 used in the model for classification.
   - [ ] Extract features from the text data and transform it into data that’s ready to be
 used in the model for classification.
+
+## Libraries Used
+- numpy
+- pandas
+- seaborn
+- scipy
+- matplotlib
+- sklearn
+
