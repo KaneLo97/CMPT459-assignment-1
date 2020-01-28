@@ -6,9 +6,9 @@ import sys
 pd.set_option('display.max_rows', 500)
 pd.set_option('display.max_columns', 500)
 pd.set_option('display.width', 1000)
-# np.set_printoptions(threshold=sys.maxsize)
+np.set_printoptions(threshold=sys.maxsize)
 
-input_df = pd.read_json('test.json.zip')
+input_df = pd.read_json('train.json.zip')
 # input_df.head(10).to_csv("test.csv")
 
 # Which columns seem useful for text feature extraction?
@@ -21,22 +21,36 @@ input_df = pd.read_json('test.json.zip')
 
 # print(input_df['features'])
 descriptions = input_df['description']
-features = input_df['features']
+features = input_df[['features', 'description']]
 # print(features)
 
-vectorizer_des = CountVectorizer()
-corpus_des = descriptions.to_numpy()
-# print(corpus_des)
-X_des = vectorizer_des.fit_transform(corpus_des)
-print(X_des.toarray())
+new_df = features[features['features'].apply(len) == 0]
+new_df.to_csv('check.csv')
+
+new_df_vectorizer = CountVectorizer()
+corpus = new_df['description'].to_numpy()
+X = new_df_vectorizer.fit_transform(corpus)
+print(new_df_vectorizer.get_feature_names())
+# my_list = X.toarray()
+# with open('array_output.txt', 'w') as f:
+#     for item in my_list:
+#         f.write("%s\n" % item)
+
+
+# vectorizer_des = CountVectorizer()
+# corpus_des = descriptions.to_numpy()
+# # print(corpus_des)
+# X_des = vectorizer_des.fit_transform(corpus_des)
+# print(X_des.toarray())
+# print(X_des.get_feature_names())
 
 # TOKENIZER IN CountVectorizer expects string or bytes-like object
 # [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']] WON'T WORK
 # Esentially, we need to convert to ['Doorman, Elevator, Cats Allowed, Dogs Allowed','Pre-War, Dogs Allowed, Cats Allowed']
 
 # This does essentially what is described above
-sample_input = [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']]
-input_corrected = [" ".join(x) for x in sample_input]
+# sample_input = [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']]
+# input_corrected = [" ".join(x) for x in sample_input]
 # print(input_corrected)
 
 # vectorizer_fea = CountVectorizer()
