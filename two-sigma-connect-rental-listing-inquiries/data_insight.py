@@ -3,10 +3,10 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 import sys 
 
-pd.set_option('display.max_rows', 500)
-pd.set_option('display.max_columns', 500)
-pd.set_option('display.width', 1000)
-np.set_printoptions(threshold=sys.maxsize)
+# pd.set_option('display.max_rows', 500)
+# pd.set_option('display.max_columns', 500)
+# pd.set_option('display.width', 1000)
+# np.set_printoptions(threshold=sys.maxsize)
 
 input_df = pd.read_json('train.json.zip')
 # input_df.head(10).to_csv("test.csv")
@@ -24,13 +24,39 @@ descriptions = input_df['description']
 features = input_df[['features', 'description']]
 # print(features)
 
-new_df = features[features['features'].apply(len) == 0]
-new_df.to_csv('check.csv')
+mask = features['features'].apply(len) == 0
+missing_features_df = features[mask]
+# new_df.to_csv('check.csv')
 
-new_df_vectorizer = CountVectorizer()
-corpus = new_df['description'].to_numpy()
-X = new_df_vectorizer.fit_transform(corpus)
-print(new_df_vectorizer.get_feature_names())
+df_has_features = features[~mask]
+all_lists = df_has_features['features'].to_numpy()
+feature_list = set()
+
+
+for each_list in all_lists:
+    for elem in each_list:
+        feature_list.add(elem)
+
+# print(feature_list)
+
+def fill_features(row):
+    result_list = []
+    for feature in feature_list:
+        if feature in row:
+            # print(row, " has feature: ", feature)
+            result_list.append(feature)
+    # print(result_list)
+    return result_list
+
+missing_features_df['features'] = missing_features_df.apply(lambda row: fill_features(row['description']),axis=1)
+print(missing_features_df['features'])
+
+
+
+# new_df_vectorizer = CountVectorizer()
+# corpus = new_df['description'].to_numpy()
+# X = new_df_vectorizer.fit_transform(corpus)
+# print(new_df_vectorizer.get_feature_names())
 # my_list = X.toarray()
 # with open('array_output.txt', 'w') as f:
 #     for item in my_list:
