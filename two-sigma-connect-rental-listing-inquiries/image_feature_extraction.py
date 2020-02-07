@@ -84,10 +84,10 @@ def process_image(path):
         plt.plot(bins, r.histogram(), 'r')
         plt.plot(bins, g.histogram(), 'g')
         plt.plot(bins, b.histogram(), 'b')
-        plt.xlabel('Pixel value')
+        plt.xlabel('Pixel')
         plt.ylabel('Frequency')
             
-        plt.savefig("last_image.png")
+        plt.savefig("first_image.png")
         count = count+1
             
 
