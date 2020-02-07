@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import os
 import sys
 import re
@@ -7,6 +5,13 @@ import operator
 from zipfile import ZipFile
 from subprocess import check_output
 from PIL import Image, ImageStat
+from skimage.io import imread
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+count = 1 #to get the first image only
 
 def exploreFiles():
 
@@ -46,14 +51,17 @@ def exploreImages():
 
     return complete_images_list
 
-
 def process_image(path):
-
+    global count
     path = './images_sample/'+path[0:7]+'/'+path
+    
     image = Image.open(path, 'r')
 
     width = image.width
     height = image.height
+
+    img = imread(path, as_gray = True)
+    pixels = (np.reshape(img, (height*width))).shape[0]
 
     #mean brightness for the images
     stat = ImageStat.Stat(image)
@@ -63,16 +71,29 @@ def process_image(path):
     rgb_im = image.convert('RGB')
     r, g, b = rgb_im.getpixel((1, 1))
     intensity = (r+g+b) / 3
-
+    
     #saturation
     max_color = max(r,g,b)
     min_color = min(r,g,b)
     sat = (max_color - min_color) / (max_color + min_color)
 
-    #return mean values
-    return width,height,bright,np.mean(sat),intensity
+    if count == 1:
+        r, g, b = image.split() #split the image into regions
 
-    #print(img)
+        bins = list(range(256))
+        plt.plot(bins, r.histogram(), 'r')
+        plt.plot(bins, g.histogram(), 'g')
+        plt.plot(bins, b.histogram(), 'b')
+        plt.xlabel('Pixel value')
+        plt.ylabel('Frequency')
+            
+        plt.savefig("last_image.png")
+        count = count+1
+            
+
+    #return mean values
+    return width,height,bright,np.mean(sat),intensity, pixels
+
 
 def process_row(row, image_files):
     result = []
@@ -86,6 +107,7 @@ def process_row(row, image_files):
     row['image_brightness'] = result[2]
     row['image_saturation'] = result[3]
     row['image_intensity'] = result[4]
+    row['pixels'] = result[5]
 
     return row
 
@@ -101,11 +123,18 @@ def main():
     folder_files = exploreFiles()
     image_files = exploreImages()
     df = df[df.listing_id.isin(folder_files)]
-    df = df.filter(['photos', 'listing_id'])
+    # df = df.filter(['photos', 'listing_id'])
     df['num_images'] = df.apply(lambda x: len(x['photos']), axis = 1)
     df = df[df['num_images'] != 0]
     df = df.apply(lambda row: process_row(row, image_files),axis=1)
-    print (df)
+    # print (df)
+
+    #do some plots
+    plt.figure(figsize=(20,6))
+    d = df[['image_saturation', 'image_brightness', 'image_width', 'image_height', 'pixels', 'num_images','interest_level']]
+    sns.pairplot(d, hue="interest_level" )
+ 
+    plt.savefig("stats.png")
 
 
 if __name__ == "__main__":
