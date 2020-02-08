@@ -1,7 +1,23 @@
 ### Milestone 1
 
 
-## Commands
+## Purpose
+
+### exploring_data.ipynb
+The code in this Jupyter Notebook implements the first phase of explotary data analysis. This file outputs histograms for multiple attributes, hourly trends, missing value counts, plots to visualize and count the number of outliers.
+
+### image_feature_extraction.py
+Multiple features from images are extracted and plotted. These features include image height, image width, image intensity, saturation, image pixels and image brightness.
+### text_feature_extraction_idf.py
+The rows with missing features are filled using the corresponding description of the listings. Mean TfIdf values for each listing are inserted into the dataframe for both features and description attributes. In addition, the global tfidf values are plotted for both features and description attributes.
+### missing_display_addr.py
+The missing display addresses are inferred using the street address attribute.
+
+## Order of operation
+
+The order of operation is irrelevant as all .py and ipynb files are independent of each other.
+
+## Running Python Files
 
 Running exploring_data.ipynb
 
@@ -11,6 +27,16 @@ Running exploring_data.ipynb
 `$ jupyter notebook`
 3. Click on `exploring_data.ipynb` to open the file
 4. Run the file by `Kernal->Restart & Run All`
+
+Running image_feature_extraction.py
+`python3 image_feature_extraction.py`
+
+Running text_feature_extraction_idf.py
+`python3 text_feature_extraction_idf.py`
+
+Running missing_display_addr.py
+`python3 missing_display_addr.py`
+
 
 ## Milestone Progress
 
