@@ -107,27 +107,27 @@ tfidf = transformer.fit_transform(X_fea_counts)
 # print(tfidf[126].toarray())
 
 # Add the Mean Tf/Idf for each row in the database for Features
-# num_of_rows = tfidf.shape[0]
-# mean_val_list = []
-# for row in range(num_of_rows):
-#     elem_list = tfidf[row].toarray()[0]
-#     # print("Row #: ", row)
-#     # print("Len of this arr is ", len(elem_list))
-#     row_vals = []
-#     mean_val = 0
-#     for elem in elem_list:
-#         if (float(elem) != float(0.0)):
-#             # print(elem)
-#             row_vals.append(float(elem))
-#     if len(row_vals) > 0:
-#         mean_val = statistics.mean(row_vals)
-#         print("Mean is ", mean_val)
-#         mean_val_list.append(mean_val)
-#     else:
-#         # print("Mean is ", 0.0)
-#         mean_val_list.append(0.0)
+num_of_rows = tfidf.shape[0]
+mean_val_list = []
+for row in range(num_of_rows):
+    elem_list = tfidf[row].toarray()[0]
+    # print("Row #: ", row)
+    # print("Len of this arr is ", len(elem_list))
+    row_vals = []
+    mean_val = 0
+    for elem in elem_list:
+        if (float(elem) != float(0.0)):
+            # print(elem)
+            row_vals.append(float(elem))
+    if len(row_vals) > 0:
+        mean_val = statistics.mean(row_vals)
+        print("Mean is ", mean_val)
+        mean_val_list.append(mean_val)
+    else:
+        # print("Mean is ", 0.0)
+        mean_val_list.append(0.0)
 
-# input_df['mean_feature_tdidf'] = mean_val_list
+input_df['mean_feature_tdidf'] = mean_val_list
 # print(input_df)
 
 
@@ -142,27 +142,27 @@ des_tfidf = des_transformer.fit_transform(X_des_counts)
 # print(vectorizer_des.get_feature_names())
 
 # # Add the Mean Tf/Idf for each row in the database for Description
-# num_of_rows = des_tfidf.shape[0]
-# mean_val_list = []
-# for row in range(num_of_rows):
-#     elem_list = des_tfidf[row].toarray()[0]
-#     # print("Row #: ", row)
-#     # print("Len of this arr is ", len(elem_list))
-#     row_vals = []
-#     mean_val = 0
-#     for elem in elem_list:
-#         if (float(elem) != float(0.0)):
-#             # print(elem)
-#             row_vals.append(float(elem))
-#     if len(row_vals) > 0:
-#         mean_val = statistics.mean(row_vals)
-#         print("Mean is ", mean_val)
-#         mean_val_list.append(mean_val)
-#     else:
-#         # print("Mean is ", 0.0)
-#         mean_val_list.append(0.0)
+num_of_rows = des_tfidf.shape[0]
+mean_val_list = []
+for row in range(num_of_rows):
+    elem_list = des_tfidf[row].toarray()[0]
+    # print("Row #: ", row)
+    # print("Len of this arr is ", len(elem_list))
+    row_vals = []
+    mean_val = 0
+    for elem in elem_list:
+        if (float(elem) != float(0.0)):
+            # print(elem)
+            row_vals.append(float(elem))
+    if len(row_vals) > 0:
+        mean_val = statistics.mean(row_vals)
+        print("Mean is ", mean_val)
+        mean_val_list.append(mean_val)
+    else:
+        # print("Mean is ", 0.0)
+        mean_val_list.append(0.0)
 
-# input_df['mean_des_tdidf'] = mean_val_list
+input_df['mean_des_tdidf'] = mean_val_list
 # print(input_df)
 
 # # # # # # # # # # # # # # # # # 
@@ -185,14 +185,14 @@ plt.show()
 
 
 # # # Global IDF for Features (descending)
-# sorted_df_desc = df_idf.sort_values(by=['idf_weights'], ascending=False)
-# print(sorted_df_desc)
-# sns.barplot(sorted_df_desc['idf_weights'],sorted_df_desc['index'][0:10,])
-# plt.xlabel("IDF Weight", fontsize=12)
-# plt.ylabel("Feature", fontsize=12)
-# plt.title("Feature vs. IDF Weight")
-# plt.show()
-# plt.savefig('feature_tfidf_dsc.png')
+sorted_df_desc = df_idf.sort_values(by=['idf_weights'], ascending=False)
+print(sorted_df_desc)
+sns.barplot(sorted_df_desc['idf_weights'],sorted_df_desc['index'][0:10,])
+plt.xlabel("IDF Weight", fontsize=12)
+plt.ylabel("Feature", fontsize=12)
+plt.title("Feature vs. IDF Weight")
+plt.show()
+plt.savefig('feature_tfidf_dsc.png')
 
 
 # # # # # # # # # # # # # # # # # 
@@ -218,8 +218,8 @@ sns.barplot(sorted_df_description_desc['idf_weights'],sorted_df_description_desc
 plt.xlabel("IDF Weight", fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.title("Feature vs. IDF Weight")
-# plt.show()
-# plt.savefig('desc_tfidf_dsc.png')
+plt.show()
+plt.savefig('desc_tfidf_dsc.png')
 
 
 
@@ -237,54 +237,12 @@ plt.title("Feature vs. IDF Weight")
         # 3) normalizing
 
 
-# print("Input DF is")
-# print(input_df['features'].loc[[10]])
-
-# print("Where features don't exist")
-# print(input_df[input_df['features'].apply(len) == 0])
-
-
-# print("Missing Features are")
-# print(missing_features_df)
-
-
-# print("Input DF is")
-# print(input_df['features'].loc[[10]])
-
-
-
-# left = result[result['features_left'].apply(len) == 0]
-# print(left)
-
-# new_df_vectorizer = CountVectorizer()
-# corpus = new_df['description'].to_numpy()
-# X = new_df_vectorizer.fit_transform(corpus)
-# print(new_df_vectorizer.get_feature_names())
-# my_list = X.toarray()
 # with open('array_output.txt', 'w') as f:
 #     for item in my_list:
 #         f.write("%s\n" % item)
 
 
-# vectorizer_des = CountVectorizer()
-# corpus_des = descriptions.to_numpy()
-# # print(corpus_des)
-# X_des = vectorizer_des.fit_transform(corpus_des)
-# print(X_des.toarray())
-# print(X_des.get_feature_names())
 
 # TOKENIZER IN CountVectorizer expects string or bytes-like object
 # [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']] WON'T WORK
 # Esentially, we need to convert to ['Doorman, Elevator, Cats Allowed, Dogs Allowed','Pre-War, Dogs Allowed, Cats Allowed']
-
-# This does essentially what is described above
-# sample_input = [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']]
-# input_corrected = [" ".join(x) for x in sample_input]
-# print(input_corrected)
-
-# vectorizer_fea = CountVectorizer()
-# corpus_fea = [" ".join(x) for x in features]
-# print(corpus_fea)
-# X_fea = vectorizer_fea.fit_transform(corpus_fea)
-# print(vectorizer_fea.get_feature_names())
-# print(X_fea.toarray())
