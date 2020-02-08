@@ -10,11 +10,12 @@ from nltk.tokenize import sent_tokenize, word_tokenize
 import statistics
 import seaborn as sns
 import matplotlib.pyplot as plt
+import re
 
 
-nltk.download('stopwords')
+# nltk.download('stopwords')
 # nltk.download('punkt')
-nltk.download('popular')
+# nltk.download('popular')
 
 # Settings for Terminal 
 # pd.set_option('display.max_rows', 500)
@@ -77,6 +78,16 @@ input_df[input_df['features'].apply(len) == 0] = missing_features_df
 # Check missing Descriptions
 missing_desc = input_df[input_df['description'].apply(len) == 0]
 print(missing_desc[['description', 'features']])
+
+# # # # # # # # # # # # # # # # # 
+# Remove HTML tags such as br   # 
+# # # # # # # # # # # # # # # # # 
+TAG_RE = re.compile(r'<[^>]+>')
+def remove_tags(text):
+    return TAG_RE.sub('', text)
+
+# Apply the function to remove tags
+input_df['description'] = input_df.apply(lambda row: remove_tags(row['description']),axis=1)
 
 # # # # # # # # # # # # # # # # # 
 # Implement Feature Extraction  # 
@@ -166,7 +177,7 @@ input_df['mean_des_tdidf'] = mean_val_list
 # print(input_df)
 
 # # # # # # # # # # # # # # # # # 
-#  Feature TfIdf Graph      # 
+#  Feature TfIdf Graph          # 
 # # # # # # # # # # # # # # # # # 
 
 # Global IDF for Features (ascending)
@@ -180,8 +191,8 @@ sns.barplot(sorted_df['idf_weights'],sorted_df['index'][0:10,])
 plt.xlabel("IDF Weight", fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.title("Feature vs. IDF Weight")
-plt.show()
-# plt.savefig('feature_tfidf_asc.png')
+# plt.show()
+plt.savefig('feature_tfidf_asc.png')
 
 
 # # # Global IDF for Features (descending)
@@ -191,7 +202,7 @@ sns.barplot(sorted_df_desc['idf_weights'],sorted_df_desc['index'][0:10,])
 plt.xlabel("IDF Weight", fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.title("Feature vs. IDF Weight")
-plt.show()
+# plt.show()
 plt.savefig('feature_tfidf_dsc.png')
 
 
@@ -207,8 +218,8 @@ sns.barplot(sorted_df_description['idf_weights'],sorted_df_description['index'][
 plt.xlabel("IDF Weight", fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.title("Feature vs. IDF Weight")
-plt.show()
-# plt.savefig('desc_tfidf_asc.png')
+# plt.show()
+plt.savefig('desc_tfidf_asc.png')
 
 
 # Global IDF for Features (descending)
@@ -219,7 +230,7 @@ plt.xlabel("IDF Weight", fontsize=12)
 plt.ylabel("Feature", fontsize=12)
 plt.title("Feature vs. IDF Weight")
 plt.show()
-plt.savefig('desc_tfidf_dsc.png')
+# plt.savefig('desc_tfidf_dsc.png')
 
 
 
