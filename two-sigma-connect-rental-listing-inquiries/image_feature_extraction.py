@@ -53,13 +53,13 @@ def exploreImages():
 
 def process_image(path):
     global count
-    path = './images_sample/'+path[0:7]+'/'+path
-    
+    path = './images_sample/'+path[0:7]+'/'+path 
     image = Image.open(path, 'r')
 
     width = image.width
     height = image.height
 
+    #calculate pixels
     img = imread(path, as_gray = True)
     pixels = (np.reshape(img, (height*width))).shape[0]
 
@@ -77,20 +77,20 @@ def process_image(path):
     min_color = min(r,g,b)
     sat = (max_color - min_color) / (max_color + min_color)
 
-    if count == 1:
+    if count == 1: #color histogram for one image only
         r, g, b = image.split() #split the image into regions
 
         bins = list(range(256))
         plt.plot(bins, r.histogram(), 'r')
         plt.plot(bins, g.histogram(), 'g')
         plt.plot(bins, b.histogram(), 'b')
-        plt.xlabel('Pixel')
-        plt.ylabel('Frequency')
+        plt.title("Color Histogram", fontsize=18)
+        plt.xlabel('Color Value')
+        plt.ylabel('Pixel count')
             
         plt.savefig("first_image.png")
         count = count+1
             
-
     #return mean values
     return width,height,bright,np.mean(sat),intensity, pixels
 
@@ -113,11 +113,9 @@ def process_row(row, image_files):
 
 
 def main():
-#
-    # with ZipFile('images_sample.zip', 'r') as zipObj:
-        # Extract all the contents of zip file in current directory
-        # zipObj.extractall()
-#
+
+    with ZipFile('images_sample.zip', 'r') as zipObj:
+        zipObj.extractall() #Extract all the contents of zip file in current directory
 
     df = pd.read_json('train.json.zip')
     folder_files = exploreFiles()
@@ -127,11 +125,11 @@ def main():
     df['num_images'] = df.apply(lambda x: len(x['photos']), axis = 1)
     df = df[df['num_images'] != 0]
     df = df.apply(lambda row: process_row(row, image_files),axis=1)
-    # print (df)
+    print (df)
 
     #do some plots
     plt.figure(figsize=(20,6))
-    d = df[['image_saturation', 'image_brightness', 'image_width', 'image_height', 'pixels', 'num_images','interest_level']]
+    d = df[['image_saturation', 'image_brightness', 'image_width', 'image_height', 'num_images','interest_level']]
     sns.pairplot(d, hue="interest_level" )
  
     plt.savefig("stats.png")
