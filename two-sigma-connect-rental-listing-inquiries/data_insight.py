@@ -2,6 +2,19 @@ import numpy as np
 import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 import sys 
+from sklearn.feature_extraction.text import TfidfTransformer
+import nltk
+from nltk.corpus import stopwords 
+from nltk.stem import WordNetLemmatizer 
+from nltk.tokenize import sent_tokenize, word_tokenize
+import statistics
+import seaborn as sns
+import matplotlib.pyplot as plt
+
+
+nltk.download('stopwords')
+# nltk.download('punkt')
+nltk.download('popular')
 
 # Settings for Terminal 
 # pd.set_option('display.max_rows', 500)
@@ -9,13 +22,23 @@ import sys
 # pd.set_option('display.width', 1000)
 # np.set_printoptions(threshold=sys.maxsize)
 
+my_stop_words = list(stopwords.words('english')) 
+
+
+# class LemmaTokenizer:
+#      def __init__(self):
+#          self.wnl = WordNetLemmatizer()
+#      def __call__(self, doc):
+#          return [self.wnl.lemmatize(t) for t in word_tokenize(doc)]
+
+
+
 input_df = pd.read_json('train.json.zip')
 
-# input_df.head(10).to_csv("test.csv")
-
-# print(input_df['features'])
-descriptions = input_df['description']
-features = input_df[['features', 'description', 'listing_id']]
+# descriptions = input_df['description']
+# features = input_df[['features', 'description', 'listing_id']]
+descriptions = input_df
+features = input_df
 # print(features)
 
 # # # # # # # # # # # # # # # # # # # # # # # # 
@@ -61,21 +84,144 @@ print(missing_desc[['description', 'features']])
 
 # Text Extraction for 'features' column
 features = input_df['features'].to_numpy()
-vectorizer_fea = CountVectorizer()
+vectorizer_fea = CountVectorizer(stop_words=my_stop_words)
 corpus_fea = [" ".join(x) for x in features]
 # print(corpus_fea)
-X_fea = vectorizer_fea.fit_transform(corpus_fea)
-vectorizer_fea.get_feature_names()
-X_fea.toarray()
+X_fea_counts = vectorizer_fea.fit_transform(corpus_fea)
+# features_list = vectorizer_fea.get_feature_names()
+# print(features_list)
+# print("Length of features list is: ", len(features_list))
+# features_list = X_fea.toarray()
+
+# To TfIDF
+transformer = TfidfTransformer(smooth_idf=False)
+tfidf = transformer.fit_transform(X_fea_counts)
+
+# print(tfidf)
+# print("DONE")
+# print(tfidf[0])
+# print(tfidf.shape[0])
+# print(tfidf[0, :].toarray())
+# print(tfidf[49351].toarray()[0])
+# print("DONE")
+# print(tfidf[126].toarray())
+
+# Add the Mean Tf/Idf for each row in the database for Features
+num_of_rows = tfidf.shape[0]
+mean_val_list = []
+for row in range(num_of_rows):
+    elem_list = tfidf[row].toarray()[0]
+    # print("Row #: ", row)
+    # print("Len of this arr is ", len(elem_list))
+    row_vals = []
+    mean_val = 0
+    for elem in elem_list:
+        if (float(elem) != float(0.0)):
+            # print(elem)
+            row_vals.append(float(elem))
+    if len(row_vals) > 0:
+        mean_val = statistics.mean(row_vals)
+        print("Mean is ", mean_val)
+        mean_val_list.append(mean_val)
+    else:
+        # print("Mean is ", 0.0)
+        mean_val_list.append(0.0)
+
+input_df['mean_feature_tdidf'] = mean_val_list
+# print(input_df)
+
 
 # Text Extraction for 'description' column
 descriptions = input_df['description'].to_numpy()
-vectorizer_des = CountVectorizer()
-corpus_des = descriptions.to_numpy()
-# print(corpus_des)
-X_des = vectorizer_des.fit_transform(corpus_des)
-X_des.toarray()
-X_des.get_feature_names()
+vectorizer_des = CountVectorizer(stop_words=my_stop_words)
+corpus_des = descriptions
+X_des_counts = vectorizer_des.fit_transform(corpus_des)
+# To TfIDF
+des_transformer = TfidfTransformer(smooth_idf=False)
+des_tfidf = des_transformer.fit_transform(X_des_counts)
+# print(vectorizer_des.get_feature_names())
+
+# # Add the Mean Tf/Idf for each row in the database for Description
+num_of_rows = des_tfidf.shape[0]
+mean_val_list = []
+for row in range(num_of_rows):
+    elem_list = des_tfidf[row].toarray()[0]
+    # print("Row #: ", row)
+    # print("Len of this arr is ", len(elem_list))
+    row_vals = []
+    mean_val = 0
+    for elem in elem_list:
+        if (float(elem) != float(0.0)):
+            # print(elem)
+            row_vals.append(float(elem))
+    if len(row_vals) > 0:
+        mean_val = statistics.mean(row_vals)
+        print("Mean is ", mean_val)
+        mean_val_list.append(mean_val)
+    else:
+        # print("Mean is ", 0.0)
+        mean_val_list.append(0.0)
+
+input_df['mean_des_tdidf'] = mean_val_list
+# print(input_df)
+
+# # # # # # # # # # # # # # # # # 
+#  Feature TfIdf Graph      # 
+# # # # # # # # # # # # # # # # # 
+
+# Global IDF for Features (ascending)
+df_idf = pd.DataFrame(transformer.idf_, index=vectorizer_fea.get_feature_names(),columns=["idf_weights"]).reset_index()
+
+# sort ascending
+sorted_df = df_idf.sort_values(by=['idf_weights'])
+print(sorted_df)
+# sorted_df.to_csv("idf.csv")
+sns.barplot(sorted_df['idf_weights'],sorted_df['index'][0:10,])
+plt.xlabel("IDF Weight", fontsize=12)
+plt.ylabel("Feature", fontsize=12)
+plt.title("Feature vs. IDF Weight")
+plt.show()
+# plt.savefig('feature_tfidf_asc.png')
+
+
+# # # Global IDF for Features (descending)
+sorted_df_desc = df_idf.sort_values(by=['idf_weights'], ascending=False)
+print(sorted_df_desc)
+sns.barplot(sorted_df_desc['idf_weights'],sorted_df_desc['index'][0:10,])
+plt.xlabel("IDF Weight", fontsize=12)
+plt.ylabel("Feature", fontsize=12)
+plt.title("Feature vs. IDF Weight")
+plt.show()
+plt.savefig('feature_tfidf_dsc.png')
+
+
+# # # # # # # # # # # # # # # # # 
+#  Description TfIdf Graph      # 
+# # # # # # # # # # # # # # # # # 
+
+df_idf_description = pd.DataFrame(des_transformer.idf_, index=vectorizer_des.get_feature_names(),columns=["idf_weights"]).reset_index()
+# sort ascending
+sorted_df_description = df_idf_description.sort_values(by=['idf_weights'])
+print(sorted_df_description)
+sns.barplot(sorted_df_description['idf_weights'],sorted_df_description['index'][0:10,])
+plt.xlabel("IDF Weight", fontsize=12)
+plt.ylabel("Feature", fontsize=12)
+plt.title("Feature vs. IDF Weight")
+plt.show()
+# plt.savefig('desc_tfidf_asc.png')
+
+
+# Global IDF for Features (descending)
+sorted_df_description_desc = df_idf_description.sort_values(by=['idf_weights'], ascending=False)
+print(sorted_df_description_desc)
+sns.barplot(sorted_df_description_desc['idf_weights'],sorted_df_description_desc['index'][0:10,])
+plt.xlabel("IDF Weight", fontsize=12)
+plt.ylabel("Feature", fontsize=12)
+plt.title("Feature vs. IDF Weight")
+plt.show()
+plt.savefig('desc_tfidf_dsc.png')
+
+
 
 # # # # # # # # # # # # # # # # # 
 #         Extra Comments        # 
@@ -91,54 +237,12 @@ X_des.get_feature_names()
         # 3) normalizing
 
 
-# print("Input DF is")
-# print(input_df['features'].loc[[10]])
-
-# print("Where features don't exist")
-# print(input_df[input_df['features'].apply(len) == 0])
-
-
-# print("Missing Features are")
-# print(missing_features_df)
-
-
-# print("Input DF is")
-# print(input_df['features'].loc[[10]])
-
-
-
-# left = result[result['features_left'].apply(len) == 0]
-# print(left)
-
-# new_df_vectorizer = CountVectorizer()
-# corpus = new_df['description'].to_numpy()
-# X = new_df_vectorizer.fit_transform(corpus)
-# print(new_df_vectorizer.get_feature_names())
-# my_list = X.toarray()
 # with open('array_output.txt', 'w') as f:
 #     for item in my_list:
 #         f.write("%s\n" % item)
 
 
-# vectorizer_des = CountVectorizer()
-# corpus_des = descriptions.to_numpy()
-# # print(corpus_des)
-# X_des = vectorizer_des.fit_transform(corpus_des)
-# print(X_des.toarray())
-# print(X_des.get_feature_names())
 
 # TOKENIZER IN CountVectorizer expects string or bytes-like object
 # [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']] WON'T WORK
 # Esentially, we need to convert to ['Doorman, Elevator, Cats Allowed, Dogs Allowed','Pre-War, Dogs Allowed, Cats Allowed']
-
-# This does essentially what is described above
-# sample_input = [['Doorman, Elevator, Cats Allowed, Dogs Allowed'],['Pre-War, Dogs Allowed, Cats Allowed']]
-# input_corrected = [" ".join(x) for x in sample_input]
-# print(input_corrected)
-
-# vectorizer_fea = CountVectorizer()
-# corpus_fea = [" ".join(x) for x in features]
-# print(corpus_fea)
-# X_fea = vectorizer_fea.fit_transform(corpus_fea)
-# print(vectorizer_fea.get_feature_names())
-# print(X_fea.toarray())
