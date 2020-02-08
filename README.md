@@ -3,15 +3,14 @@
 
 ## Commands
 
-Running explore.ipynb
+Running exploring_data.ipynb
 
 1. Change directory
 `$ cd two-sigma-connect-rental-listing-inquiries/`
 2. Start Jupyter Notebook server
 `$ jupyter notebook`
-3. Click on `explore.ipynb` to open the file
+3. Click on `exploring_data.ipynb` to open the file
 4. Run the file by `Kernal->Restart & Run All`
-
 
 ## Milestone Progress
 
@@ -30,7 +29,7 @@ demonstrate them. Handle outliers.
 * Feature extraction from images and text
   - [x] Extract features from the images and transform it into data that’s ready to be
 used in the model for classification.
-  - [ ] Extract features from the text data and transform it into data that’s ready to be
+  - [x] Extract features from the text data and transform it into data that’s ready to be
 used in the model for classification.
 
 ## Libraries Used
@@ -40,4 +39,6 @@ used in the model for classification.
 - scipy
 - matplotlib
 - sklearn
+- pillow
+- nltk
 
